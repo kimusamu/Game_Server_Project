@@ -8,6 +8,8 @@ Server : Multi-thread 기반 IOCP 비동기 서버
 
 Client : STML 기반 Client
 
+제작 기간 : 2025.04 - 2025.06
+
 
 # 조작
 
