@@ -14,10 +14,13 @@ void disconnect(int c_id)
     int last_potion = clients[c_id]->potion;
     int last_exppotion = clients[c_id]->exp_potion;
     int last_gold = clients[c_id]->gold;
+	int last_attend_streak = clients[c_id]->attend_streak;
+	int last_last_attend_claim_day = clients[c_id]->last_attend_claim_day;
 
     if (!clients[c_id]->is_dummy)
     {
-        DB_SavePlayerPosition(w_userid, last_x, last_y, last_hp, last_exp, last_level, last_potion, last_exppotion, last_gold);
+        DB_SavePlayerPosition(w_userid, last_x, last_y, last_hp, last_exp, last_level, 
+            last_potion, last_exppotion, last_gold, last_attend_streak, last_last_attend_claim_day);
     }
 
     clients[c_id]->vl.lock();
@@ -107,6 +110,8 @@ void process_packet(int c_id, char* packet)
         int saved_potion = 0;
         int saved_exppotion = 0;
         int saved_gold = 0;
+		int saved_attend_streak = 0;
+		int saved_last_attend_claim_day = 0;
 
         if (conv_len == 0)
         {
@@ -125,8 +130,8 @@ void process_packet(int c_id, char* packet)
 
         if (!clients[c_id]->is_dummy)
         {
-            bool exist = DB_LoadPlayerPosition(w_userid, saved_x, saved_y, saved_hp, saved_exp,
-                saved_level, saved_potion, saved_exppotion, saved_gold);
+            bool exist = DB_LoadPlayerPosition(w_userid, saved_x, saved_y, saved_hp, saved_exp,saved_level,
+                saved_potion, saved_exppotion, saved_gold, saved_attend_streak, saved_last_attend_claim_day);
 
             if (!exist)
             {
@@ -141,8 +146,11 @@ void process_packet(int c_id, char* packet)
                 saved_potion = 0;
                 saved_exppotion = 0;
                 saved_gold = 0;
+                saved_attend_streak = 0;
+                saved_last_attend_claim_day = 0;
 
-                DB_InsertPlayerPosition(w_userid, saved_x, saved_y, saved_hp, saved_exp, saved_level, saved_potion, saved_exppotion, saved_gold);
+                DB_InsertPlayerPosition(w_userid, saved_x, saved_y, saved_hp, saved_exp, saved_level, 
+                    saved_potion, saved_exppotion, saved_gold, saved_attend_streak, saved_last_attend_claim_day);
 
                 exist = true;
             }
@@ -174,6 +182,8 @@ void process_packet(int c_id, char* packet)
             clients[c_id]->potion = saved_potion;
             clients[c_id]->exp_potion = saved_exppotion;
             clients[c_id]->gold = saved_gold;
+			clients[c_id]->attend_streak = saved_attend_streak;
+			clients[c_id]->last_attend_claim_day = saved_last_attend_claim_day;
             clients[c_id]->is_invincible = true;
             clients[c_id]->invincible_end_time = high_resolution_clock::now() + INVINCIBLE_ON_RESPAWN;
         }
@@ -510,6 +520,86 @@ void process_packet(int c_id, char* packet)
         sess->send_stat_change_packet();
         break;
     }
+
+    case CS_BUY_ITEM:
+    {
+        auto* p = reinterpret_cast<CS_BUY_ITEM_PACKET*>(packet);
+        auto& sess = clients[c_id];
+
+        if (sess->state.load() != ST_INGAME)
+        {
+            break;
+        }
+
+        if (p->size != sizeof(CS_BUY_ITEM_PACKET))
+        {
+            break;
+        }
+
+        if (p->item_type != 1 && p->item_type != 2)
+        {
+            break;
+        }
+
+        if (sess->gold < 1) 
+        {
+            break;
+        }
+
+        sess->gold -= 1;
+
+        if (p->item_type == 1) 
+        {
+            sess->potion += 1;
+            std::cout << sess->name << " BOUGHT HP POTION (gold -1) \n";
+        }
+
+        else 
+        {
+            sess->exp_potion += 1;
+            std::cout << sess->name << " BOUGHT EXP POTION (gold -1) \n";
+        }
+
+        sess->send_stat_change_packet();
+
+        break;
+    }
+
+    case CS_ATTEND_CLAIM:
+    {
+        auto& sess = clients[c_id];
+
+        if (sess->state.load() != ST_INGAME)
+        {
+            break;
+        }
+
+        const int today = today_date();
+
+        if (sess->last_attend_claim_day == today) 
+        {
+            sess->send_chat_packet(c_id, "You Already Been Received.");
+            break;
+        }
+
+        if (sess->last_attend_claim_day == today - 1) 
+        {
+            sess->attend_streak += 1;
+        }
+
+        else 
+        {
+            sess->attend_streak = 1;
+        }
+
+        sess->gold += 10;
+        sess->last_attend_claim_day = today;
+
+        sess->send_stat_change_packet();
+		sess->send_chat_packet(c_id, "Got a 10 Gold!");
+
+        break;
+	}
 
     default:
         break;

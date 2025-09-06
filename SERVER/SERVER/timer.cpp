@@ -85,7 +85,7 @@ void periodic_save()
                 if (len > 0)
                 {
                     cout << " DB SAVE ... \n";
-                    DB_SavePlayerPosition(w_userid, sess->x, sess->y, sess->hp, sess->exp, sess->level, sess->potion, sess->exp_potion, sess->gold);
+                    DB_SavePlayerPosition(w_userid, sess->x, sess->y, sess->hp, sess->exp, sess->level, sess->potion, sess->exp_potion, sess->gold, sess->attend_streak, sess->last_attend_claim_day);
                 }
             }
         }

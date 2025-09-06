@@ -20,3 +20,5 @@ void handle_heal(shared_ptr<SESSION> s);
 void handle_monster_attack(shared_ptr<SESSION> monster, shared_ptr <SESSION> player);
 
 void schedule_heal_event(int session_id);
+
+int today_date();

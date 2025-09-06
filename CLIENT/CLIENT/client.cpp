@@ -63,6 +63,26 @@ static sf::RectangleShape ip_input_box;
 static sf::RectangleShape id_input_box;
 static std::string error_message;
 
+static bool shop_open = false;
+static sf::RectangleShape shop_panel;
+static sf::RectangleShape hp_button;
+static sf::RectangleShape exp_button;
+static sf::Text shop_title_text;
+static sf::Text shop_desc_text;
+static sf::Text hp_label_text;
+static sf::Text exp_label_text;
+static sf::Text gold_label_text;
+static sf::FloatRect hp_btn_bounds;
+static sf::FloatRect exp_btn_bounds;
+
+static bool attendance_open = false;
+static sf::RectangleShape attend_panel;
+static sf::RectangleShape attend_button;
+static sf::Text attend_title_text;
+static sf::Text attend_desc_text;
+static sf::Text attend_btn_text;
+static sf::FloatRect attend_btn_bounds;
+
 static std::deque<std::string> chat_history;
 static std::unordered_set<int> obstacle_set;
 
@@ -273,6 +293,96 @@ void initialize_login_screen()
     error_text.setPosition(200, 500);
 }
 
+void initialize_shop_ui()
+{
+    shop_panel.setSize({ 360.f, 220.f });
+    shop_panel.setFillColor(sf::Color(0, 0, 0, 190));
+    shop_panel.setOutlineColor(sf::Color(200, 200, 255, 200));
+    shop_panel.setOutlineThickness(2.f);
+    shop_panel.setPosition(WINDOW_WIDTH - 380.f, 40.f);
+
+    shop_title_text.setFont(g_font);
+    shop_title_text.setCharacterSize(22);
+    shop_title_text.setFillColor(sf::Color::White);
+    shop_title_text.setStyle(sf::Text::Bold);
+    shop_title_text.setString("== SHOP ==");
+    shop_title_text.setPosition(shop_panel.getPosition().x + 16.f, shop_panel.getPosition().y + 10.f);
+
+    shop_desc_text.setFont(g_font);
+    shop_desc_text.setCharacterSize(16);
+    shop_desc_text.setFillColor(sf::Color(200, 200, 200));
+    shop_desc_text.setString("All Items: 1 Gold");
+    shop_desc_text.setPosition(shop_panel.getPosition().x + 16.f, shop_panel.getPosition().y + 46.f);
+
+    gold_label_text.setFont(g_font);
+    gold_label_text.setCharacterSize(16);
+    gold_label_text.setFillColor(sf::Color::Yellow);
+    gold_label_text.setPosition(shop_panel.getPosition().x + 16.f, shop_panel.getPosition().y + 72.f);
+
+    hp_button.setSize({ 320.f, 48.f });
+    hp_button.setFillColor(sf::Color(40, 80, 40, 220));
+    hp_button.setOutlineColor(sf::Color(120, 200, 120));
+    hp_button.setOutlineThickness(2.f);
+    hp_button.setPosition(shop_panel.getPosition().x + 20.f, shop_panel.getPosition().y + 100.f);
+
+    hp_label_text.setFont(g_font);
+    hp_label_text.setCharacterSize(18);
+    hp_label_text.setFillColor(sf::Color::White);
+    hp_label_text.setString("Buy a HP potion");
+    hp_label_text.setPosition(hp_button.getPosition().x + 12.f, hp_button.getPosition().y + 10.f);
+
+    exp_button.setSize({ 320.f, 48.f });
+    exp_button.setFillColor(sf::Color(40, 40, 80, 220));
+    exp_button.setOutlineColor(sf::Color(120, 120, 200));
+    exp_button.setOutlineThickness(2.f);
+    exp_button.setPosition(shop_panel.getPosition().x + 20.f, shop_panel.getPosition().y + 160.f);
+
+    exp_label_text.setFont(g_font);
+    exp_label_text.setCharacterSize(18);
+    exp_label_text.setFillColor(sf::Color::White);
+    exp_label_text.setString("Buy a EXP potion");
+    exp_label_text.setPosition(exp_button.getPosition().x + 12.f, exp_button.getPosition().y + 10.f);
+
+    hp_btn_bounds = sf::FloatRect(hp_button.getPosition(), hp_button.getSize());
+    exp_btn_bounds = sf::FloatRect(exp_button.getPosition(), exp_button.getSize());
+}
+
+void initialize_attendance_ui()
+{
+    attend_panel.setSize({ 360.f, 160.f });
+    attend_panel.setFillColor(sf::Color(0, 0, 0, 190));
+    attend_panel.setOutlineColor(sf::Color(255, 230, 150, 220));
+    attend_panel.setOutlineThickness(2.f);
+    attend_panel.setPosition(WINDOW_WIDTH - 380.f, 280.f);
+
+    attend_title_text.setFont(g_font);
+    attend_title_text.setCharacterSize(22);
+    attend_title_text.setFillColor(sf::Color::White);
+    attend_title_text.setStyle(sf::Text::Bold);
+    attend_title_text.setString("== Attendance Book ==");
+    attend_title_text.setPosition(attend_panel.getPosition().x + 16.f, attend_panel.getPosition().y + 10.f);
+
+    attend_desc_text.setFont(g_font);
+    attend_desc_text.setCharacterSize(16);
+    attend_desc_text.setFillColor(sf::Color(230, 230, 230));
+    attend_desc_text.setString("Once a day, Reward: 10 Gold");
+    attend_desc_text.setPosition(attend_panel.getPosition().x + 16.f, attend_panel.getPosition().y + 46.f);
+
+    attend_button.setSize({ 320.f, 48.f });
+    attend_button.setFillColor(sf::Color(80, 60, 20, 220));
+    attend_button.setOutlineColor(sf::Color(230, 200, 120));
+    attend_button.setOutlineThickness(2.f);
+    attend_button.setPosition(attend_panel.getPosition().x + 20.f, attend_panel.getPosition().y + 90.f);
+
+    attend_btn_text.setFont(g_font);
+    attend_btn_text.setCharacterSize(18);
+    attend_btn_text.setFillColor(sf::Color::White);
+    attend_btn_text.setString("Get Your Today's Reward");
+    attend_btn_text.setPosition(attend_button.getPosition().x + 12.f, attend_button.getPosition().y + 10.f);
+
+    attend_btn_bounds = sf::FloatRect(attend_button.getPosition(), attend_button.getSize());
+}
+
 void client_initialize()
 {
     if (!self_texture.loadFromFile("player.png"))
@@ -342,6 +452,8 @@ void client_initialize()
     chat_input_text.setPosition(5.0f, WINDOW_HEIGHT - chat_box_height - 22.0f);
 
     initialize_login_screen();
+    initialize_shop_ui();
+    initialize_attendance_ui();
 }
 
 void client_finish()
@@ -511,6 +623,42 @@ void handle_login_input(sf::Event& event)
             }
         }
     }
+}
+
+void draw_shop()
+{
+    if (!shop_open)
+    {
+        return;
+    }
+
+    std::ostringstream goldss;
+    goldss << "Gold: " << avatar.m_gold;
+    gold_label_text.setString(goldss.str());
+
+    g_window->draw(shop_panel);
+    g_window->draw(shop_title_text);
+    g_window->draw(shop_desc_text);
+    g_window->draw(gold_label_text);
+
+    g_window->draw(hp_button);
+    g_window->draw(exp_button);
+    g_window->draw(hp_label_text);
+    g_window->draw(exp_label_text);
+}
+
+void draw_attendance()
+{
+    if (!attendance_open)
+    {
+        return;
+    }
+
+    g_window->draw(attend_panel);
+    g_window->draw(attend_title_text);
+    g_window->draw(attend_desc_text);
+    g_window->draw(attend_button);
+    g_window->draw(attend_btn_text);
 }
 
 void ProcessPacket(char* ptr)
@@ -914,6 +1062,37 @@ void send_packet(void* packet)
     s_socket.send(packet, p[0], sent);
 }
 
+void send_buy_item(unsigned char item_type)
+{
+    if (avatar.m_gold < 1)
+    {
+        chat_history.push_back(std::string("Gold is Not Enough."));
+
+        if (chat_history.size() > CHAT_HISTORY_MAX)
+        {
+            chat_history.pop_front();
+        }
+
+        return;
+    }
+
+    CS_BUY_ITEM_PACKET pkt;
+    pkt.size = sizeof(pkt);
+    pkt.type = CS_BUY_ITEM;
+    pkt.item_type = item_type;
+
+    send_packet(&pkt);
+}
+
+void send_attendance_claim()
+{
+    CS_ATTEND_CLAIM_PACKET pkt;
+    pkt.size = sizeof(pkt);
+    pkt.type = CS_ATTEND_CLAIM;
+
+    send_packet(&pkt);
+}
+
 void handle_game_input(sf::Event& event)
 {
     if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter && !is_typing)
@@ -976,24 +1155,28 @@ void handle_game_input(sf::Event& event)
         case sf::Keyboard::Left:
         {
             direction = 2;
+
             break;
         }
 
         case sf::Keyboard::Right:
         {
             direction = 3;
+
             break;
         }
 
         case sf::Keyboard::Up:
         {
             direction = 0;
+
             break;
         }
 
         case sf::Keyboard::Down:
         {
             direction = 1;
+
             break;
         }
 
@@ -1013,12 +1196,41 @@ void handle_game_input(sf::Event& event)
             is_entering_ip = true;
             ip_input_box.setOutlineColor(sf::Color::Green);
             id_input_box.setOutlineColor(sf::Color::White);
+
+            if (s_socket.getRemotePort() != 0) 
+            {
+                s_socket.disconnect();
+            }
+
+            g_window->close();
+
             break;
         }
 
         case sf::Keyboard::I:
         {
             inventory_open = !inventory_open;
+
+            break;
+        }
+
+        case sf::Keyboard::P:
+        {
+            shop_open = !shop_open;
+
+            break;
+        }
+
+        case sf::Keyboard::O:
+        {
+            attendance_open = !attendance_open;
+
+            if (attendance_open) 
+            { 
+                shop_open = false; 
+                inventory_open = false; 
+            }
+
             break;
         }
 
@@ -1032,6 +1244,7 @@ void handle_game_input(sf::Event& event)
                 use_pkt.potion_type = 1;
                 send_packet(&use_pkt);
             }
+
             break;
         }
 
@@ -1045,6 +1258,7 @@ void handle_game_input(sf::Event& event)
                 use_pkt.potion_type = 2;
                 send_packet(&use_pkt);
             }
+
             break;
         }
 
@@ -1080,6 +1294,7 @@ void handle_game_input(sf::Event& event)
                     attack_effects.push_back(fx);
                 }
             }
+
             break;
         }
         }
@@ -1091,6 +1306,31 @@ void handle_game_input(sf::Event& event)
             move_pkt.type = CS_MOVE;
             move_pkt.direction = direction;
             send_packet(&move_pkt);
+        }
+    }
+
+    if (shop_open && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+    {
+        sf::Vector2f mousePos = g_window->mapPixelToCoords({ event.mouseButton.x, event.mouseButton.y });
+
+        if (hp_btn_bounds.contains(mousePos))
+        {
+            send_buy_item(1);
+        }
+
+        else if (exp_btn_bounds.contains(mousePos))
+        {
+            send_buy_item(2);
+        }
+    }
+
+    if (attendance_open && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+    {
+        sf::Vector2f mousePos = g_window->mapPixelToCoords({ event.mouseButton.x, event.mouseButton.y });
+
+        if (attend_btn_bounds.contains(mousePos)) 
+        {
+            send_attendance_claim();
         }
     }
 }
@@ -1141,6 +1381,10 @@ int main()
             {
                 draw_inventory();
             }
+
+            draw_shop();
+
+            draw_attendance();
 
             if (is_typing)
             {

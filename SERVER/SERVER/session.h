@@ -49,6 +49,8 @@ public:
     int gold;
     int greet_target = -1;
     int ref_event_player_move = LUA_NOREF;
+    int attend_streak;
+	int last_attend_claim_day;
 
     char name[NAME_SIZE];
 

@@ -27,6 +27,8 @@ SESSION::SESSION()
     potion = 0;
     exp_potion = 0;
     gold = 0;
+    attend_streak = 0;
+	last_attend_claim_day = 0;
 }
 
 SESSION::~SESSION() {}

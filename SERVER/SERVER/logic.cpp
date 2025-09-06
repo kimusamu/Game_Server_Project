@@ -383,3 +383,18 @@ void schedule_heal_event(int session_id)
         }
     }
 }
+
+int today_date()
+{
+    time_t now = time(0);
+    tm local_tm;
+
+#ifdef _WIN32
+    localtime_s(&local_tm, &now);
+
+#else
+    localtime_r(&now, &local_tm);
+
+#endif
+    return (local_tm.tm_year + 1900) * 10000 + (local_tm.tm_mon + 1) * 100 + local_tm.tm_mday;
+}

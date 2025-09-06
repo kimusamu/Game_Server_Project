@@ -85,7 +85,7 @@ void DB_Cleanup()
 }
 
 bool DB_LoadPlayerPosition(const wchar_t* user_id, int& out_x, int& out_y, int& out_hp, int& out_exp,
-    int& out_level, int& out_potion, int& out_exppotion, int& out_gold)
+    int& out_level, int& out_potion, int& out_exppotion, int& out_gold, int& out_attend_streak, int& out_last_attend_claim_day)
 {
     std::lock_guard<std::mutex> lk(db_mutex);
     SQLHSTMT h_stmt = SQL_NULL_HSTMT;
@@ -99,7 +99,7 @@ bool DB_LoadPlayerPosition(const wchar_t* user_id, int& out_x, int& out_y, int& 
     }
 
 
-    SQLWCHAR* sql = (SQLWCHAR*)L"{ CALL dbo.sp_LoadPlayerPosition(?, ?, ?, ?, ?, ?, ?, ?, ?) }";
+    SQLWCHAR* sql = (SQLWCHAR*)L"{ CALL dbo.sp_LoadPlayerPosition(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }";
     rc = SQLPrepareW(h_stmt, sql, SQL_NTS);
 
     if (rc != SQL_SUCCESS && rc != SQL_SUCCESS_WITH_INFO)
@@ -125,6 +125,10 @@ bool DB_LoadPlayerPosition(const wchar_t* user_id, int& out_x, int& out_y, int& 
         0, 0, &out_exppotion, 0, NULL);
     SQLBindParameter(h_stmt, 9, SQL_PARAM_OUTPUT, SQL_C_LONG, SQL_INTEGER,
         0, 0, &out_gold, 0, NULL);
+    SQLBindParameter(h_stmt, 10, SQL_PARAM_OUTPUT, SQL_C_LONG, SQL_INTEGER,
+        0, 0, &out_attend_streak, 0, NULL);
+    SQLBindParameter(h_stmt, 11, SQL_PARAM_OUTPUT, SQL_C_LONG, SQL_INTEGER,
+        0, 0, &out_last_attend_claim_day, 0, NULL);
 
 
     rc = SQLExecute(h_stmt);
@@ -144,7 +148,8 @@ CLEANUP:
     return false;
 }
 
-bool DB_InsertPlayerPosition(const wchar_t* user_id, short x, short y, int hp, int exp, int level, int potion, int exp_potion, int gold)
+bool DB_InsertPlayerPosition(const wchar_t* user_id, short x, short y, int hp, int exp, int level, 
+    int potion, int exp_potion, int gold, int attend_streak, int last_attend_claim_day)
 {
     std::lock_guard<std::mutex> lk(db_mutex);
     SQLHSTMT h_stmt = SQL_NULL_HSTMT;
@@ -158,7 +163,7 @@ bool DB_InsertPlayerPosition(const wchar_t* user_id, short x, short y, int hp, i
     }
 
 
-    static const SQLWCHAR* sql = L"{ CALL dbo.sp_InsertPlayerPosition(?, ?, ?, ?, ?, ?, ?, ?, ?) }";
+    static const SQLWCHAR* sql = L"{ CALL dbo.sp_InsertPlayerPosition(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }";
     rc = SQLPrepareW(h_stmt, const_cast<SQLWCHAR*>(sql), SQL_NTS);
 
     if (rc != SQL_SUCCESS && rc != SQL_SUCCESS_WITH_INFO)
@@ -184,6 +189,10 @@ bool DB_InsertPlayerPosition(const wchar_t* user_id, short x, short y, int hp, i
         0, 0, &exp_potion, 0, nullptr);
     SQLBindParameter(h_stmt, 9, SQL_PARAM_INPUT, SQL_C_LONG, SQL_INTEGER,
         0, 0, &gold, 0, nullptr);
+    SQLBindParameter(h_stmt, 10, SQL_PARAM_INPUT, SQL_C_LONG, SQL_INTEGER,
+        0, 0, &attend_streak, 0, nullptr);
+    SQLBindParameter(h_stmt, 11, SQL_PARAM_INPUT, SQL_C_LONG, SQL_INTEGER,
+        0, 0, &last_attend_claim_day, 0, nullptr);
 
     rc = SQLExecute(h_stmt);
 
@@ -202,7 +211,8 @@ CLEANUP:
     return false;
 }
 
-bool DB_SavePlayerPosition(const wchar_t* user_id, int x, int y, int hp, int exp, int level, int potion, int exp_potion, int gold)
+bool DB_SavePlayerPosition(const wchar_t* user_id, int x, int y, int hp, int exp, int level, 
+    int potion, int exp_potion, int gold, int attend_streak, int last_attend_claim_day)
 {
     std::lock_guard<std::mutex> lk(db_mutex);
 
@@ -222,7 +232,7 @@ bool DB_SavePlayerPosition(const wchar_t* user_id, int x, int y, int hp, int exp
         return false;
     }
 
-    static const SQLWCHAR* sql = L"{ CALL dbo.sp_SavePlayerPosition(?, ?, ?, ?, ?, ?, ?, ?, ?) }";
+    static const SQLWCHAR* sql = L"{ CALL dbo.sp_SavePlayerPosition(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }";
     rc = SQLPrepareW(h_stmt, const_cast<SQLWCHAR*>(sql), SQL_NTS);
 
     if (rc != SQL_SUCCESS && rc != SQL_SUCCESS_WITH_INFO)
@@ -259,6 +269,9 @@ bool DB_SavePlayerPosition(const wchar_t* user_id, int x, int y, int hp, int exp
     bindParam(7, SQL_C_SLONG, SQL_INTEGER, 0, &potion, 0);
     bindParam(8, SQL_C_SLONG, SQL_INTEGER, 0, &exp_potion, 0);
     bindParam(9, SQL_C_SLONG, SQL_INTEGER, 0, &gold, 0);
+    bindParam(10, SQL_C_SLONG, SQL_INTEGER, 0, &attend_streak, 0);
+    bindParam(11, SQL_C_SLONG, SQL_INTEGER, 0, &last_attend_claim_day, 0);
+
 
 
     rc = SQLExecute(h_stmt);

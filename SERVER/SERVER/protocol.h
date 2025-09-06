@@ -23,6 +23,8 @@ constexpr char CS_ATTACK = 3;
 constexpr char CS_TELEPORT = 4;
 constexpr char CS_LOGOUT = 5;
 constexpr char CS_USE_POTION = 6;
+constexpr char CS_BUY_ITEM = 7;
+constexpr char CS_ATTEND_CLAIM = 8;
 
 constexpr char SC_LOGIN_INFO = 2;
 constexpr char SC_ADD_OBJECT = 3;
@@ -76,6 +78,17 @@ struct CS_USE_POTION_PACKET {
 	unsigned char size;
 	char type;
 	char potion_type;
+};
+
+struct CS_BUY_ITEM_PACKET {
+	unsigned char size;
+	char type;
+	char item_type;
+};
+
+struct CS_ATTEND_CLAIM_PACKET {
+	unsigned char size;
+	char type;
 };
 
 struct SC_LOGIN_INFO_PACKET {
